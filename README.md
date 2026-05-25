@@ -31,6 +31,8 @@ py -3 -m uvicorn app.main:app --reload
 
 **Подробная инструкция** (установка, просмотр админ/студент, телефон, сброс БД): **[docs/ИНСТРУКЦИЯ.md](docs/ИНСТРУКЦИЯ.md)**
 
+**CI/CD и деплой на Yandex Cloud** (GitHub Actions, секреты, SSH, диагностика): **[docs/CI-CD.md](docs/CI-CD.md)**
+
 ## Тесты
 
 ```bash

@@ -1,3 +1,20 @@
+# =============================================================================
+# CI/CD
+# Полная инструкция: docs/CI-CD.md
+# Push в master → GitHub Actions (pytest) → SSH-деплой на ВМ schedule-diploma
+# Секреты: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY (только в GitHub Actions)
+# =============================================================================
+
+# Локальные файлы деплоя (не коммитить)
+deploy.secrets
+deploy.local.env
+*.pem
+id_rsa
+id_ed25519
+yc_schedule_diploma
+yc_schedule_diploma.pub
+
+# Python / приложение
 .venv/
 __pycache__/
 *.py[cod]
