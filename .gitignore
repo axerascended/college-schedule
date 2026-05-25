@@ -2,6 +2,7 @@
 # CI/CD (только локально, не в GitHub)
 # Полная инструкция: docs/CI-CD.md — файл в .gitignore, хранится на вашем ПК
 # Push в master → GitHub Actions (pytest) → SSH-деплой на ВМ schedule-diploma
+# Домен: A-запись da.servers31.ru → IP ВМ; на сервере: sudo DOMAIN=da.servers31.ru bash deploy/setup-domain.sh
 # Секреты: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY (только в GitHub Actions)
 # =============================================================================
 docs/CI-CD.md
