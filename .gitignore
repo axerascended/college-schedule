@@ -1,9 +1,10 @@
 # =============================================================================
-# CI/CD
-# Полная инструкция: docs/CI-CD.md
+# CI/CD (только локально, не в GitHub)
+# Полная инструкция: docs/CI-CD.md — файл в .gitignore, хранится на вашем ПК
 # Push в master → GitHub Actions (pytest) → SSH-деплой на ВМ schedule-diploma
 # Секреты: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY (только в GitHub Actions)
 # =============================================================================
+docs/CI-CD.md
 
 # Локальные файлы деплоя (не коммитить)
 deploy.secrets
