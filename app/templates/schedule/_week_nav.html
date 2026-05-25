@@ -1,0 +1,68 @@
+<div class="card mb-3 no-print border-0 bg-body-secondary">
+    <div class="card-body py-3">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+            <div>
+                <div class="text-muted small">Календарная неделя</div>
+                <div class="fw-semibold">{{ week_label }}</div>
+                <span class="badge bg-secondary">{{ week_parity_label }} неделя</span>
+                {% if is_current_week %}
+                <span class="badge bg-primary">текущая</span>
+                {% endif %}
+            </div>
+            <div class="btn-group" role="group" aria-label="Навигация по неделям">
+                <a class="btn btn-outline-secondary btn-sm {% if not can_prev_week %}disabled{% endif %}"
+                   href="?{{ query_base }}week_start={{ prev_week_iso }}&view={{ view_mode }}"
+                   {% if not can_prev_week %}tabindex="-1" aria-disabled="true"{% endif %}>← Пред.</a>
+                <a class="btn btn-outline-primary btn-sm"
+                   href="?{{ query_base }}week_start={{ today_monday_iso }}&view=week">Сейчас</a>
+                <a class="btn btn-outline-secondary btn-sm {% if not can_next_week %}disabled{% endif %}"
+                   href="?{{ query_base }}week_start={{ next_week_iso }}&view={{ view_mode }}"
+                   {% if not can_next_week %}tabindex="-1" aria-disabled="true"{% endif %}>След. →</a>
+            </div>
+        </div>
+        <form method="get" class="row g-2 align-items-end">
+            {% if not readonly and groups %}
+            <div class="col-md-3">
+                <label class="form-label small mb-0">Группа</label>
+                <select name="group_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                    {% for g in groups %}
+                    <option value="{{ g.id }}" {% if g.id == group.id %}selected{% endif %}>{{ g.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small mb-0">Период (семестр)</label>
+                <select name="period_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                    {% for p in periods %}
+                    <option value="{{ p.id }}" {% if p.id == period.id %}selected{% endif %}>{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+            <div class="col-md-{% if readonly %}8{% else %}4{% endif %}">
+                <label class="form-label small mb-0">Выбор недели (по месяцам)</label>
+                <select name="week_start" class="form-select form-select-sm" onchange="this.form.submit()">
+                    {% for month_key, month_label, weeks in week_groups %}
+                    <optgroup label="{{ month_label }}">
+                        {% for w in weeks %}
+                        <option value="{{ w.week_start.isoformat() }}"
+                                {% if w.week_start == week_start %}selected{% endif %}>
+                            {{ w.label }} — {{ 'нечётн.' if w.parity.value == 'odd' else 'чётн.' }}
+                        </option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="hidden" name="view" value="{{ view_mode }}">
+                <div class="btn-group w-100" role="group">
+                    <a href="?{{ query_base }}week_start={{ week_start_iso }}&view=week"
+                       class="btn btn-sm {% if view_mode != 'today' %}btn-primary{% else %}btn-outline-primary{% endif %}">Неделя</a>
+                    <a href="?{{ query_base }}week_start={{ week_start_iso }}&view=today"
+                       class="btn btn-sm {% if view_mode == 'today' %}btn-primary{% else %}btn-outline-primary{% endif %}">День</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

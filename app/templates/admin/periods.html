@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Периоды расписания{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Периоды расписания</h1>
+<a href="/admin/periods/new" class="btn btn-primary btn-sm mb-3">Добавить период</a>
+<table class="table table-striped">
+    <thead><tr><th>Название</th><th>С</th><th>По</th><th>Статус</th><th></th></tr></thead>
+    <tbody>
+        {% for p in periods %}
+        <tr>
+            <td>{{ p.name }}</td>
+            <td>{{ p.valid_from }}</td>
+            <td>{{ p.valid_to }}</td>
+            <td>
+                {% if p.is_published %}
+                <span class="badge bg-success">Опубликовано</span>
+                {% else %}
+                <span class="badge bg-secondary">Черновик</span>
+                {% endif %}
+            </td>
+            <td class="text-end">
+                {% if not p.is_published %}
+                <form method="post" action="/admin/periods/{{ p.id }}/publish" class="d-inline">
+                    <button class="btn btn-sm btn-success">Опубликовать</button>
+                </form>
+                {% endif %}
+                <a href="/admin/periods/{{ p.id }}/edit" class="btn btn-sm btn-outline-secondary">Изменить</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

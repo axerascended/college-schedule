@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Группы{% endblock %}
+{% block content %}
+{% set active = 'groups' %}
+{% include "directories/_nav.html" %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">Группы</h1>
+    <a href="/admin/directories/groups/new" class="btn btn-primary btn-sm">Добавить</a>
+</div>
+<table class="table table-striped">
+    <thead><tr><th>Название</th><th>Курс</th><th></th></tr></thead>
+    <tbody>
+        {% for g in items %}
+        <tr>
+            <td>{{ g.name }}</td>
+            <td>{{ g.course }}</td>
+            <td class="text-end">
+                <a href="/admin/directories/groups/{{ g.id }}/edit" class="btn btn-sm btn-outline-secondary">Изменить</a>
+                <form method="post" action="/admin/directories/groups/{{ g.id }}/delete" class="d-inline" onsubmit="return confirm('Удалить?')">
+                    <button class="btn btn-sm btn-outline-danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="text-muted">Нет групп</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

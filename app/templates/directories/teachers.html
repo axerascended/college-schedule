@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Преподаватели{% endblock %}
+{% block content %}
+{% set active = 'teachers' %}
+{% include "directories/_nav.html" %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">Преподаватели</h1>
+    <a href="/admin/directories/teachers/new" class="btn btn-primary btn-sm">Добавить</a>
+</div>
+<table class="table table-striped">
+    <thead><tr><th>ФИО</th><th></th></tr></thead>
+    <tbody>
+        {% for t in items %}
+        <tr>
+            <td>{{ t.full_name }}</td>
+            <td class="text-end">
+                <a href="/admin/directories/teachers/{{ t.id }}/edit" class="btn btn-sm btn-outline-secondary">Изменить</a>
+                <form method="post" action="/admin/directories/teachers/{{ t.id }}/delete" class="d-inline" onsubmit="return confirm('Удалить?')">
+                    <button class="btn btn-sm btn-outline-danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2" class="text-muted">Нет преподавателей</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

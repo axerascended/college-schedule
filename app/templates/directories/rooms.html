@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Аудитории{% endblock %}
+{% block content %}
+{% set active = 'rooms' %}
+{% include "directories/_nav.html" %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">Аудитории</h1>
+    <a href="/admin/directories/rooms/new" class="btn btn-primary btn-sm">Добавить</a>
+</div>
+<table class="table table-striped">
+    <thead><tr><th>Номер</th><th>Вместимость</th><th></th></tr></thead>
+    <tbody>
+        {% for r in items %}
+        <tr>
+            <td>{{ r.number }}</td>
+            <td>{{ r.capacity }}</td>
+            <td class="text-end">
+                <a href="/admin/directories/rooms/{{ r.id }}/edit" class="btn btn-sm btn-outline-secondary">Изменить</a>
+                <form method="post" action="/admin/directories/rooms/{{ r.id }}/delete" class="d-inline" onsubmit="return confirm('Удалить?')">
+                    <button class="btn btn-sm btn-outline-danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="text-muted">Нет аудиторий</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

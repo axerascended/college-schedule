@@ -1,0 +1,121 @@
+{% set sb = schedule_base|default('/admin') %}
+<div class="schedule-table-wrap table-responsive">
+    <table class="table table-bordered schedule-grid">
+        <thead>
+            <tr>
+                <th>Пара / время</th>
+                {% for day in days %}
+                <th class="{% if day_dates and day_dates[day] == today %}table-primary{% elif day == today_dow %}table-primary{% endif %}">
+                    {{ DAY_NAMES[day] }}
+                    {% if day_dates %}
+                    <br><small class="fw-normal text-muted">{{ day_dates[day].strftime('%d.%m') }}</small>
+                    {% endif %}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for pair in pairs %}
+            {% set pt = pair_times.get(pair) if pair_times else none %}
+            <tr>
+                <th class="text-nowrap schedule-pair-label">
+                    <span class="d-block">{{ pair }}-я пара</span>
+                    {% if pt %}
+                    <small class="text-muted fw-normal">{{ format_time_range(pt.start, pt.end) }}</small>
+                    {% endif %}
+                </th>
+                {% for day in days %}
+                {% set key = (day, pair) %}
+                {% set cell_entries = grid.get(key, []) %}
+                {% set slot = slot_map.get(key) %}
+                <td class="schedule-cell {% if day_dates and day_dates[day] == today %}schedule-cell-today{% elif day == today_dow %}schedule-cell-today{% endif %}">
+                    {% if cell_entries %}
+                        {% for e in cell_entries %}
+                        <div class="mb-1 p-1 border rounded {% if teacher_mode and e.teacher_id == current_teacher_id %}border-primary bg-primary-subtle{% else %}bg-body-secondary{% endif %}">
+                            {% if slot or e.time_slot %}
+                            <div class="schedule-time-badge small text-primary fw-semibold mb-1">
+                                {{ format_time_range((slot or e.time_slot).start_time, (slot or e.time_slot).end_time) }}
+                            </div>
+                            {% endif %}
+                            <strong>{{ e.subject.name }}</strong><br>
+                            <small>{{ e.teacher.full_name }}</small><br>
+                            <small>ауд. {{ e.room.number }}</small>
+                            {% if e.week_type.value != 'every' %}
+                            <span class="badge bg-secondary">{{ WEEK_TYPE_LABELS[e.week_type] }}</span>
+                            {% endif %}
+                            {% if not readonly and (not teacher_mode or e.teacher_id == current_teacher_id) %}
+                            <div class="mt-1">
+                                <a href="{{ sb }}/entries/{{ e.id }}/edit" class="btn btn-link btn-sm p-0">изм.</a>
+                                <form method="post" action="{{ sb }}/entries/{{ e.id }}/delete" class="d-inline" onsubmit="return confirm('Удалить занятие?')">
+                                    <button type="submit" class="btn btn-link btn-sm p-0 text-danger">удал.</button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% elif not readonly and slot_map.get(key) and (not teacher_mode or not cell_entries) %}
+                        <a href="{{ sb }}/entries/new?group_id={{ group.id }}&period_id={{ period.id }}&time_slot_id={{ slot_map[key].id }}&week_start={{ week_start_iso }}" class="text-muted small">+ занятие</a>
+                    {% else %}
+                        <span class="text-muted">—</span>
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% if breaks_after_pair and breaks_after_pair.get(pair) %}
+            {% set br = breaks_after_pair[pair] %}
+            <tr class="schedule-break-row">
+                <td class="text-center text-muted small schedule-break-cell">
+                    Перемена<br>{{ format_time_range(br.start, br.end) }}
+                </td>
+                <td colspan="{{ days|length }}" class="schedule-break-cell text-muted small text-center">
+                    Перемена {{ format_time_range(br.start, br.end) }}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="day-cards">
+    {% for day in days %}
+    {% if view_mode != 'today' or day == today_dow %}
+    <div class="card mb-3 {% if day == today_dow %}border-primary{% endif %}">
+        <div class="card-header fw-bold">
+            {{ DAY_NAMES[day] }}
+            {% if day_dates %}<span class="fw-normal text-muted"> · {{ day_dates[day].strftime('%d.%m') }}</span>{% endif %}
+        </div>
+        <div class="card-body">
+            {% for pair in pairs %}
+            {% set key = (day, pair) %}
+            {% set cell_entries = grid.get(key, []) %}
+            {% set slot = slot_map.get(key) %}
+            {% set pt = pair_times.get(pair) if pair_times else none %}
+            {% if cell_entries %}
+            <div class="mb-2 pb-2 border-bottom">
+                <div class="text-muted small">
+                    {{ pair }}-я пара
+                    {% if pt %} · {{ format_time_range(pt.start, pt.end) }}{% endif %}
+                </div>
+                {% for e in cell_entries %}
+                <div class="mt-1">
+                    {% if slot or e.time_slot %}
+                    <span class="badge text-bg-primary mb-1">{{ format_time_range((slot or e.time_slot).start_time, (slot or e.time_slot).end_time) }}</span>
+                    {% endif %}
+                    <div><strong>{{ e.subject.name }}</strong></div>
+                    <small class="text-muted">{{ e.teacher.full_name }}, ауд. {{ e.room.number }}</small>
+                    {% if e.week_type.value != 'every' %}<span class="badge bg-secondary">{{ WEEK_TYPE_LABELS[e.week_type] }}</span>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if breaks_after_pair and breaks_after_pair.get(pair) %}
+            {% set br = breaks_after_pair[pair] %}
+            <div class="text-muted small mb-2 fst-italic">Перемена {{ format_time_range(br.start, br.end) }}</div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>

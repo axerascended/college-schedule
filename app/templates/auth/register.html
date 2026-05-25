@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Регистрация студента — Расписание{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-2">Регистрация студента</h1>
+                <p class="text-muted small mb-4">Создайте аккаунт для просмотра расписания своей группы</p>
+                {% if errors %}
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            {% for err in errors %}
+                            <li>{{ err }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% if not groups %}
+                    <div class="alert alert-warning">Группы ещё не созданы. Попросите администратора добавить группы в справочнике.</div>
+                {% else %}
+                <form method="post" action="/register">
+                    <div class="mb-3">
+                        <label class="form-label" for="full_name">ФИО</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name"
+                               value="{{ form.full_name or '' }}" required autocomplete="name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               value="{{ form.email or '' }}" required autocomplete="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="group_id">Группа</label>
+                        <select class="form-select" id="group_id" name="group_id" required>
+                            <option value="" disabled {% if not form.group_id %}selected{% endif %}>Выберите группу</option>
+                            {% for g in groups %}
+                            <option value="{{ g.id }}" {% if form.group_id == g.id %}selected{% endif %}>
+                                {{ g.name }}{% if g.course %} (курс {{ g.course }}){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password"
+                               required minlength="6" autocomplete="new-password">
+                        <div class="form-text">Не менее 6 символов</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="password_confirm">Повторите пароль</label>
+                        <input type="password" class="form-control" id="password_confirm" name="password_confirm"
+                               required minlength="6" autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
+                </form>
+                {% endif %}
+                <p class="text-center text-muted small mt-3 mb-0">
+                    Уже есть аккаунт? <a href="/login">Войти</a> · <a href="/register/teacher">Преподаватель</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

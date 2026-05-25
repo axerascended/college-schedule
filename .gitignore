@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+schedule.db
+.pytest_cache/
+htmlcov/
+.coverage

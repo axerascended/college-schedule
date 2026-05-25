@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% set sb = schedule_base|default('/admin') %}
+{% block title %}{% if teacher_mode %}Мои занятия{% else %}Список занятий{% endif %}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">{% if teacher_mode %}Мои занятия{% else %}Список занятий{% endif %}</h1>
+    <a href="{{ sb }}/entries/new" class="btn btn-primary btn-sm">Добавить</a>
+</div>
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Группа</th><th>Предмет</th>{% if not teacher_mode %}<th>Преподаватель</th>{% endif %}<th>Ауд.</th><th>Слот</th><th>Неделя</th><th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in entries %}
+        <tr>
+            <td>{{ e.group.name }}</td>
+            <td>{{ e.subject.name }}</td>
+            {% if not teacher_mode %}<td>{{ e.teacher.full_name }}</td>{% endif %}
+            <td>{{ e.room.number }}</td>
+            <td>{{ DAY_NAMES[e.time_slot.day_of_week] }}, {{ e.time_slot.pair_number }}-я</td>
+            <td>{{ WEEK_TYPE_LABELS[e.week_type] }}</td>
+            <td class="text-end text-nowrap">
+                {% if not teacher_mode or e.teacher_id == current_teacher_id %}
+                <a href="{{ sb }}/entries/{{ e.id }}/edit" class="btn btn-sm btn-outline-secondary">Изм.</a>
+                <form method="post" action="{{ sb }}/entries/{{ e.id }}/delete" class="d-inline" onsubmit="return confirm('Удалить?')">
+                    <button class="btn btn-sm btn-outline-danger">Удал.</button>
+                </form>
+                {% else %}
+                <span class="text-muted small">—</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="{% if teacher_mode %}6{% else %}7{% endif %}" class="text-muted">Нет занятий</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

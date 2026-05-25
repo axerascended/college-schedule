@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% set sb = schedule_base|default('/admin') %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">{{ title }}</h1>
+
+{% if errors %}
+<div class="alert alert-danger">
+    <ul class="mb-0">
+        {% for err in errors %}
+        <li>{{ err }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form method="post">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Период</label>
+            <select name="period_id" class="form-select" required>
+                {% for p in periods %}
+                <option value="{{ p.id }}" {% if form.period_id == p.id %}selected{% endif %}>{{ p.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Группа</label>
+            <select name="group_id" class="form-select" required>
+                {% for g in groups %}
+                <option value="{{ g.id }}" {% if form.group_id == g.id %}selected{% endif %}>{{ g.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Предмет</label>
+            <select name="subject_id" class="form-select" required>
+                {% for s in subjects %}
+                <option value="{{ s.id }}" {% if form.subject_id == s.id %}selected{% endif %}>{{ s.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Преподаватель</label>
+            {% if teacher_mode %}
+            {% for t in teachers if t.id == form.teacher_id %}
+            <input type="text" class="form-control" value="{{ t.full_name }}" readonly>
+            {% endfor %}
+            <input type="hidden" name="teacher_id" value="{{ form.teacher_id }}">
+            {% else %}
+            <select name="teacher_id" class="form-select" required>
+                {% for t in teachers %}
+                <option value="{{ t.id }}" {% if form.teacher_id == t.id %}selected{% endif %}>{{ t.full_name }}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Аудитория</label>
+            <select name="room_id" class="form-select" required>
+                {% for r in rooms %}
+                <option value="{{ r.id }}" {% if form.room_id == r.id %}selected{% endif %}>{{ r.number }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Слот (день и пара)</label>
+            <select name="time_slot_id" class="form-select" required>
+                {% for ts in time_slots %}
+                <option value="{{ ts.id }}" {% if form.time_slot_id == ts.id %}selected{% endif %}>
+                    {{ DAY_NAMES[ts.day_of_week] }}, {{ ts.pair_number }}-я пара ({{ ts.start_time.strftime('%H:%M') }}–{{ ts.end_time.strftime('%H:%M') }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Тип недели</label>
+            <select name="week_type" class="form-select">
+                {% for wt in week_types %}
+                <option value="{{ wt.value }}" {% if form.week_type == wt.value %}selected{% endif %}>{{ WEEK_TYPE_LABELS[wt] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Действует с</label>
+            <input type="date" name="valid_from" class="form-control" value="{{ form.valid_from }}" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Действует по</label>
+            <input type="date" name="valid_to" class="form-control" value="{{ form.valid_to }}" required>
+        </div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a href="{{ cancel_url }}" class="btn btn-outline-secondary">Отмена</a>
+    </div>
+</form>
+{% endblock %}

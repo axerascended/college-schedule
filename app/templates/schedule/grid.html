@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% set sb = schedule_base|default('/admin') %}
+{% block title %}Расписание — {{ group.name }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 no-print">
+    <h1 class="h3 mb-0">{% if teacher_mode %}Редактирование:{% else %}Расписание:{% endif %} {{ group.name }}</h1>
+    <div class="d-flex flex-wrap gap-2">
+        {% if not readonly %}
+        <a href="{{ sb }}/entries" class="btn btn-sm btn-outline-secondary">{% if teacher_mode %}Мои занятия{% else %}Список занятий{% endif %}</a>
+        {% endif %}
+        <button onclick="window.print()" class="btn btn-sm btn-outline-secondary">Печать</button>
+    </div>
+</div>
+
+{% set query_base = '' %}
+{% if not readonly and groups %}
+{% set query_base = 'group_id=' ~ group.id ~ '&period_id=' ~ period.id ~ '&' %}
+{% endif %}
+
+{% include "schedule/_week_nav.html" %}
+
+{% if unpublished_warning %}
+<div class="alert alert-warning">Расписание ещё не опубликовано администратором.</div>
+{% endif %}
+
+{% if today_outside_selected_week %}
+<div class="alert alert-info no-print">
+    Режим «День» показывает сегодня только для <strong>текущей</strong> недели.
+    <a href="?{{ query_base }}week_start={{ today_monday_iso }}&view=today">Перейти на текущую неделю</a>
+</div>
+{% endif %}
+
+{% if teacher_mode %}
+<div class="alert alert-info no-print small">
+    Вы видите расписание группы целиком. Изменять и добавлять можно только <strong>свои</strong> занятия (подсвечены синим).
+</div>
+{% endif %}
+
+{% include "schedule/_grid_body.html" %}
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Новый пользователь{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Новый пользователь</h1>
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Пароль</label>
+        <input type="password" name="password" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">ФИО</label>
+        <input type="text" name="full_name" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Роль</label>
+        <select name="role" class="form-select" id="roleSelect">
+            <option value="student">Студент</option>
+            <option value="teacher">Преподаватель</option>
+            <option value="admin">Администратор</option>
+        </select>
+    </div>
+    <div class="mb-3" id="groupField">
+        <label class="form-label">Группа (для студента)</label>
+        <select name="group_id" class="form-select">
+            <option value="">—</option>
+            {% for g in groups %}
+            <option value="{{ g.id }}">{{ g.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3" id="teacherField" style="display:none">
+        <label class="form-label">Преподаватель (для входа в систему)</label>
+        <select name="teacher_id" class="form-select">
+            <option value="">—</option>
+            {% for t in teachers %}
+            <option value="{{ t.id }}">{{ t.full_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Создать</button>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+function updateRoleFields() {
+    const role = document.getElementById('roleSelect').value;
+    document.getElementById('groupField').style.display = role === 'student' ? 'block' : 'none';
+    document.getElementById('teacherField').style.display = role === 'teacher' ? 'block' : 'none';
+}
+document.getElementById('roleSelect').addEventListener('change', updateRoleFields);
+updateRoleFields();
+</script>
+{% endblock %}
