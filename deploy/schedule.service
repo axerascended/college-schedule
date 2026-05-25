@@ -1,0 +1,16 @@
+[Unit]
+Description=College schedule FastAPI app
+After=network.target
+
+[Service]
+Type=simple
+User=yc-user
+Group=yc-user
+WorkingDirectory=/home/yc-user/college-schedule
+EnvironmentFile=/home/yc-user/college-schedule/.env
+ExecStart=/home/yc-user/college-schedule/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

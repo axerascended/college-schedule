@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .env
 schedule.db
+data/
 .pytest_cache/
 htmlcov/
 .coverage
