@@ -7,7 +7,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.config import settings
 from app.routers import admin_directories, admin_schedule, auth, home, student, teacher_schedule
 
-app = FastAPI(title="Расписание колледжа", debug=settings.debug)
+app = FastAPI(title=f"{settings.college_name} — расписание", debug=settings.debug)
 
 app.add_middleware(
     SessionMiddleware,

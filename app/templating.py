@@ -2,12 +2,14 @@ from pathlib import Path
 
 from fastapi.templating import Jinja2Templates
 
+from app.config import settings
 from app.models.schedule_entry import WeekType
 from app.services.schedule_conflict_service import DAY_NAMES
 from app.services.time_slot_display_service import format_time, format_time_range
 
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
+templates.env.globals["college_name"] = settings.college_name
 templates.env.globals["DAY_NAMES"] = DAY_NAMES
 templates.env.globals["format_time"] = format_time
 templates.env.globals["format_time_range"] = format_time_range

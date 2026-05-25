@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     secret_key: str = "dev-secret-key-change-in-production"
     database_url: str = "sqlite:///./schedule.db"
     debug: bool = True
+    college_name: str = "Валуйский колледж"
 
 
 settings = Settings()
