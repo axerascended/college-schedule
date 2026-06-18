@@ -1,26 +1,29 @@
 {% extends "base.html" %}
-{% block title %}Новый пользователь{% endblock %}
+{% block title %}{% if edit_user %}Редактировать пользователя{% else %}Новый пользователь{% endif %}{% endblock %}
 {% block content %}
-<h1 class="h3 mb-4">Новый пользователь</h1>
-<form method="post">
+<h1 class="h3 mb-4">{% if edit_user %}Редактировать пользователя{% else %}Новый пользователь{% endif %}</h1>
+<form method="post" action="{% if edit_user %}/admin/users/{{ edit_user.id }}/edit{% else %}/admin/users/new{% endif %}">
     <div class="mb-3">
         <label class="form-label">Email</label>
-        <input type="email" name="email" class="form-control" required>
+        <input type="email" name="email" class="form-control" required
+               value="{{ edit_user.email if edit_user else '' }}">
     </div>
     <div class="mb-3">
         <label class="form-label">Пароль</label>
-        <input type="password" name="password" class="form-control" required>
+        <input type="password" name="password" class="form-control" {% if not edit_user %}required{% endif %}
+               {% if edit_user %}placeholder="Оставьте пустым, чтобы не менять"{% endif %}>
     </div>
     <div class="mb-3">
         <label class="form-label">ФИО</label>
-        <input type="text" name="full_name" class="form-control" required>
+        <input type="text" name="full_name" class="form-control" required
+               value="{{ edit_user.full_name if edit_user else '' }}">
     </div>
     <div class="mb-3">
         <label class="form-label">Роль</label>
         <select name="role" class="form-select" id="roleSelect">
-            <option value="student">Студент</option>
-            <option value="teacher">Преподаватель</option>
-            <option value="admin">Администратор</option>
+            <option value="student" {% if edit_user and edit_user.role.value == 'student' %}selected{% endif %}>Студент</option>
+            <option value="teacher" {% if edit_user and edit_user.role.value == 'teacher' %}selected{% endif %}>Преподаватель</option>
+            <option value="admin" {% if edit_user and edit_user.role.value == 'admin' %}selected{% endif %}>Администратор</option>
         </select>
     </div>
     <div class="mb-3" id="groupField">
@@ -28,7 +31,7 @@
         <select name="group_id" class="form-select">
             <option value="">—</option>
             {% for g in groups %}
-            <option value="{{ g.id }}">{{ g.name }}</option>
+            <option value="{{ g.id }}" {% if edit_user and edit_user.group_id == g.id %}selected{% endif %}>{{ g.name }}</option>
             {% endfor %}
         </select>
     </div>
@@ -37,11 +40,12 @@
         <select name="teacher_id" class="form-select">
             <option value="">—</option>
             {% for t in teachers %}
-            <option value="{{ t.id }}">{{ t.full_name }}</option>
+            <option value="{{ t.id }}" {% if edit_user and edit_user.teacher_id == t.id %}selected{% endif %}>{{ t.full_name }}</option>
             {% endfor %}
         </select>
     </div>
-    <button type="submit" class="btn btn-primary">Создать</button>
+    <button type="submit" class="btn btn-primary">{% if edit_user %}Сохранить{% else %}Создать{% endif %}</button>
+    <a href="/admin/users" class="btn btn-outline-secondary">Отмена</a>
 </form>
 {% endblock %}
 {% block scripts %}

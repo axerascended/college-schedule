@@ -424,6 +424,36 @@ def user_new_form(
             "flash": [],
             "groups": directory.list_groups(),
             "teachers": directory.list_teachers(),
+            "edit_user": None,
+        },
+    )
+
+
+@router.get("/users/{user_id}/edit")
+def user_edit_form(
+    request: Request,
+    user: Annotated[User | RedirectResponse, Depends(require_admin)],
+    db: Session = Depends(get_db),
+    user_id: int = 0,
+):
+    if isinstance(user, RedirectResponse):
+        return user
+    from app.repositories.user_repository import UserRepository
+
+    edit_user = UserRepository(db).get_by_id(user_id)
+    if edit_user is None:
+        _flash(request, "Пользователь не найден", "danger")
+        return RedirectResponse("/admin/users", status_code=303)
+    directory = DirectoryService(db)
+    return templates.TemplateResponse(
+        request,
+        "admin/user_form.html",
+        {
+            "user": user,
+            "flash": [],
+            "groups": directory.list_groups(),
+            "teachers": directory.list_teachers(),
+            "edit_user": edit_user,
         },
     )
 
@@ -460,4 +490,63 @@ def user_create(
         teacher_id=tid,
     )
     _flash(request, "Пользователь создан")
+    return RedirectResponse("/admin/users", status_code=303)
+
+
+@router.post("/users/{user_id}/edit")
+def user_update(
+    request: Request,
+    user: Annotated[User | RedirectResponse, Depends(require_admin)],
+    db: Session = Depends(get_db),
+    user_id: int = 0,
+    email: str = Form(...),
+    password: str = Form(""),
+    full_name: str = Form(...),
+    role: str = Form(...),
+    group_id: str = Form(""),
+    teacher_id: str = Form(""),
+):
+    if isinstance(user, RedirectResponse):
+        return user
+    from app.models.user import UserRole
+    from app.services.auth_service import AuthService, AuthUserAdminError
+
+    gid = int(group_id) if group_id and role == "student" else None
+    tid = int(teacher_id) if teacher_id and role == "teacher" else None
+    auth = AuthService(db)
+    try:
+        auth.update_user(
+            user_id=user_id,
+            email=email,
+            full_name=full_name,
+            role=UserRole(role),
+            group_id=gid,
+            teacher_id=tid,
+            password=password or None,
+        )
+    except AuthUserAdminError as exc:
+        _flash(request, str(exc), "danger")
+        return RedirectResponse(f"/admin/users/{user_id}/edit", status_code=303)
+    _flash(request, "Пользователь обновлён")
+    return RedirectResponse("/admin/users", status_code=303)
+
+
+@router.post("/users/{user_id}/delete")
+def user_delete(
+    request: Request,
+    user: Annotated[User | RedirectResponse, Depends(require_admin)],
+    db: Session = Depends(get_db),
+    user_id: int = 0,
+):
+    if isinstance(user, RedirectResponse):
+        return user
+    from app.services.auth_service import AuthService, AuthUserAdminError
+
+    auth = AuthService(db)
+    try:
+        auth.delete_user(user_id, acting_user_id=user.id)
+    except AuthUserAdminError as exc:
+        _flash(request, str(exc), "danger")
+        return RedirectResponse("/admin/users", status_code=303)
+    _flash(request, "Пользователь удалён")
     return RedirectResponse("/admin/users", status_code=303)
